@@ -10,7 +10,7 @@ def addNewProduct(product : Product):
     product_collection.insert_one(product.model_dump())
     return {
         "message" : "Product added",
-        "prduct" : product
+        "product" : product
     }
 
 @router.get("/product",status_code=200)
