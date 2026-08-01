@@ -1,21 +1,39 @@
 from fastapi import HTTPException
 from app.Models.models import User
+from app.Models.models import LoginRequest
 from ..Database.database import user_collection
 
 class userService:
+
     def userRegister(newUser:User):
-            existing_users=list(user_collection.find())
-            for user in existing_users:
-                if user["user_email"] == newUser.user_email:
-                    return HTTPException(status_code=400, detail="Email already exists")
+            existing_user=user_collection.find_one({"user_email":newUser.user_email})
+            if existing_user:
+                raise HTTPException(status_code=400,detail="User already exists")
             user_collection.insert_one(newUser.model_dump())
             return {
-                    "message":"User added" if newUser.user_role=="user" else "Admin added",
-                    "user":newUser
-                }
-
+                "message" : "Admin registered" if newUser.user_role=="admin" else "User registered",
+                "user" : newUser
+            }
+    
+    def userLogin(loginUser:LoginRequest):
+        user=user_collection.find_one(
+             {"user_email":loginUser.user_email}
+        )
+        if user is not None:
+            if user["user_password"] == loginUser.user_password:
+                 return{
+                      "Message" : "User loggedIn"
+                 }
+            else:
+                 raise HTTPException(status_code=400,detail="Email or password is invalid")
+        else:
+            return{
+              "detail" : "Register before login"
+              }
+         
     def getAllUsers():
         users=list(user_collection.find())
         for user in users:
             user["_id"]=str(user["_id"])
         return users
+

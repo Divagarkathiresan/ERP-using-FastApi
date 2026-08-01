@@ -13,3 +13,8 @@ class User(BaseModel):
     user_email : str 
     user_password : str
     user_role : Literal["admin", "user"]="user"
+
+#login model
+class LoginRequest(BaseModel):
+    user_email: str
+    user_password: str
