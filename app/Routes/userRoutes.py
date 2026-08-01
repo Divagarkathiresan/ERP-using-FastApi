@@ -3,6 +3,7 @@ from ..Database.database import user_collection
 from ..Models.models import User
 from ..Models.models import LoginRequest
 from ..Services.userService import userService
+from ..utils.jwtconfig import generateToken
 
 userRouter=APIRouter()
 
@@ -21,3 +22,13 @@ class userRoute:
     @userRouter.get("/user",status_code=200)
     def getAllUsers():
         return userService.getAllUsers()
+
+    # @userRouter.get("/token",status_code=200)
+    # def checkToken():
+    #     token = generateToken(
+    #         {
+    #             "user_email":"divagar656@gmail.com",
+    #             "user_password":"1234"
+    #         }
+    #     )
+    #     return {"token" : token}

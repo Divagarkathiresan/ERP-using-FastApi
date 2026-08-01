@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from app.Models.models import User
 from app.Models.models import LoginRequest
 from ..Database.database import user_collection
+from ..utils.jwtconfig import generateToken
 
 class userService:
 
@@ -21,9 +22,22 @@ class userService:
         )
         if user is not None:
             if user["user_password"] == loginUser.user_password:
-                 return{
-                      "Message" : "User loggedIn"
-                 }
+                #  return{
+                #       "Message" : "User loggedIn"
+                #  }
+
+                token=generateToken(
+                     {
+                          "user_email":user["user_email"],
+                          "user_role":user["user_role"]
+                     }
+                )
+
+                return {
+                     "message":"User loggedIn",
+                     "token" : token
+                }
+            
             else:
                  raise HTTPException(status_code=400,detail="Email or password is invalid")
         else:
@@ -37,3 +51,4 @@ class userService:
             user["_id"]=str(user["_id"])
         return users
 
+         
