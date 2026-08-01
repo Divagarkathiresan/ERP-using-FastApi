@@ -1,11 +1,11 @@
 from fastapi import APIRouter,HTTPException
-from .database import product_collection
-from .models import Product
+from ..Database.database import product_collection
+from ..Models.models import Product
 from bson import ObjectId
 
-router = APIRouter()
+productRouter = APIRouter()
 
-@router.post("/product", status_code=201)
+@productRouter.post("/product", status_code=201)
 def addNewProduct(product : Product):
     product_collection.insert_one(product.model_dump())
     return {
@@ -13,14 +13,14 @@ def addNewProduct(product : Product):
         "product" : product
     }
 
-@router.get("/product",status_code=200)
+@productRouter.get("/product",status_code=200)
 def getAllProducts():
     products=list(product_collection.find())
     for product in products:
         product["_id"]=str(product["_id"])
     return products
 
-@router.get("/product/{id}",status_code=200)
+@productRouter.get("/product/{id}",status_code=200)
 def getSingleProduct(id : str):
     product=product_collection.find_one(
         { "_id" : ObjectId(id)}
@@ -31,7 +31,7 @@ def getSingleProduct(id : str):
     else:
         raise HTTPException(status_code=404,detail="Product not found")
 
-@router.put("/product/{id}")
+@productRouter.put("/product/{id}")
 def updateSingleProduct(id:str,updateProduct:Product):
     product=product_collection.update_one(
         {"_id" : ObjectId(id)},
@@ -46,7 +46,7 @@ def updateSingleProduct(id:str,updateProduct:Product):
             "Updated Product":updateProduct
         }
 
-@router.delete("/product/{id}")
+@productRouter.delete("/product/{id}")
 def deleteSingleProduct(id:str):
     result=product_collection.delete_one(
         {"_id":ObjectId(id)}
@@ -58,14 +58,14 @@ def deleteSingleProduct(id:str):
         return {"Message" : "Data deleted"}
 
 #pagination
-@router.get("/products/pagination")
+@productRouter.get("/products/pagination")
 def getProductsPageWise(page:int=1,limit:int=5):
     skip=(page-1)*limit
     products=list(product_collection.find().skip(skip).limit(limit))
     for product in products:
         product["_id"]=str(product["_id"])
 
-    total_items=product_collection.count_documents({})
+    total_items=len(list(product_collection.find()))
 
     return {
         "products":products,
@@ -76,7 +76,7 @@ def getProductsPageWise(page:int=1,limit:int=5):
     }
 
 #filter
-@router.get("/products/filter")
+@productRouter.get("/products/filter")
 def getProductsByCategory(category:str):
     productsCategoryWise=list(product_collection.find(
         {"product_category":category}
@@ -86,7 +86,7 @@ def getProductsByCategory(category:str):
     return productsCategoryWise
 
 #sorting
-@router.get("/products/sort")
+@productRouter.get("/products/sort")
 def getProductsSortedByPrice(order:str="asc",sorting:str="product_price"):
     sort_order=1 if order=="asc" else -1
     productsSortedByPrice=list(product_collection.find().sort(sorting,sort_order))
