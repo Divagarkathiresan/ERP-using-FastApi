@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from app.Models.models import User
 from app.Models.models import LoginRequest
 from ..Database.database import user_collection
-from ..utils.jwtconfig import generateToken
+from ..utils.jwtconfig import *
 
 class userService:
 
@@ -22,9 +22,6 @@ class userService:
         )
         if user is not None:
             if user["user_password"] == loginUser.user_password:
-                #  return{
-                #       "Message" : "User loggedIn"
-                #  }
 
                 token=generateToken(
                      {
@@ -51,4 +48,14 @@ class userService:
             user["_id"]=str(user["_id"])
         return users
 
-         
+
+    def getTokenUser(token:str):
+
+        payload=decodeToken(token)
+        email=payload["user_email"]
+        user=user_collection.find_one(
+            {"user_email" : email}
+        )
+        if user is not None:
+            user["_id"]=str(user["_id"])
+        return user

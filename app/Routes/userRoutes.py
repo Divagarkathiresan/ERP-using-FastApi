@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,Body
 from ..Database.database import user_collection
 from ..Models.models import User
 from ..Models.models import LoginRequest
@@ -32,3 +32,8 @@ class userRoute:
     #         }
     #     )
     #     return {"token" : token}
+
+    @userRouter.get("/getUser")
+    def getUser(token:str = Body(... ,embed=True)):
+        return userService.getTokenUser(token)
+

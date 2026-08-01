@@ -24,3 +24,13 @@ def generateToken(detail : dict):
     )
 
     return token
+
+def decodeToken(token:str):
+    
+    payload=jwt.decode(
+        token,
+        SECRET_KEY,
+        algorithms=ALGORITHM
+    )
+
+    return payload
