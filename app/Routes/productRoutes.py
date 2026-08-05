@@ -1,17 +1,21 @@
-from fastapi import APIRouter,HTTPException
+from fastapi import Depends,APIRouter,HTTPException
 from ..Database.database import product_collection
 from ..Models.models import Product
 from bson import ObjectId
+from ..Services.userService import userService
 
 productRouter = APIRouter()
 
 @productRouter.post("/product", status_code=201)
-def addNewProduct(product : Product):
-    product_collection.insert_one(product.model_dump())
-    return {
-        "message" : "Product added",
-        "product" : product
-    }
+def addNewProduct(product : Product,current_user=Depends(userService.getCurrentUser)):
+    if current_user["user_role"]=="admin":
+        product_collection.insert_one(product.model_dump())
+        return {
+            "message" : "Product added",
+            "product" : product
+        }
+    else:
+        raise HTTPException(status_code=403, detail="Only admin can add products")
 
 @productRouter.get("/product",status_code=200)
 def getAllProducts():
@@ -23,7 +27,7 @@ def getAllProducts():
 @productRouter.get("/product/{id}",status_code=200)
 def getSingleProduct(id : str):
     product=product_collection.find_one(
-        { "_id" : ObjectId(id)}
+        {"product_id" : id}
     )
     if product is not None:
         product["_id"]=str(product["_id"])
@@ -34,7 +38,7 @@ def getSingleProduct(id : str):
 @productRouter.put("/product/{id}")
 def updateSingleProduct(id:str,updateProduct:Product):
     product=product_collection.update_one(
-        {"_id" : ObjectId(id)},
+        {"product_id" : id},
         {"$set" : updateProduct.model_dump()}
     )
 
@@ -56,6 +60,13 @@ def deleteSingleProduct(id:str):
         raise HTTPException(status_code=200,detail="No data deleted")
     else:
         return {"Message" : "Data deleted"}
+
+@productRouter.delete("/all")
+def deleteAllProducts():
+    result = product_collection.delete_many({})
+    return {
+        "message":"All products deleted "
+    }
 
 #pagination
 @productRouter.get("/products/pagination")

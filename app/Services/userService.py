@@ -1,9 +1,12 @@
-from fastapi import HTTPException
+from fastapi import Depends,HTTPException
 from app.Models.models import User
 from app.Models.models import LoginRequest
 from ..Database.database import user_collection
 from ..utils.jwtconfig import *
+from jose import jwt,JWTError
+from fastapi.security import OAuth2PasswordBearer
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="user/login")
 class userService:
 
     def userRegister(newUser:User):
@@ -49,13 +52,36 @@ class userService:
         return users
 
 
-    def getTokenUser(token:str):
+    def getCurrentUser(token:str = Depends(oauth2_scheme)):
+        try:
+            payload = jwt.decode(
+                token,
+                SECRET_KEY,
+                algorithms=[ALGORITHM]
+            )
+            user_email = payload.get("user_email")
 
-        payload=decodeToken(token)
-        email=payload["user_email"]
-        user=user_collection.find_one(
-            {"user_email" : email}
+            if user_email is None:
+                raise HTTPException(
+                    status_code=401,
+                    detail="Invalid token"
+            )
+        except JWTError:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid or expired token"
+            )
+        user = user_collection.find_one(
+            {
+                "user_email": user_email
+            }
         )
-        if user is not None:
-            user["_id"]=str(user["_id"])
+
+        if user is None:
+            raise HTTPException(
+                status_code=401,
+                detail="User not found"
+            )
+
+        user["_id"]=str(user["_id"])
         return user

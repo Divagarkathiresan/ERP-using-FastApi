@@ -35,5 +35,5 @@ class userRoute:
 
     @userRouter.get("/getUser")
     def getUser(token:str = Body(... ,embed=True)):
-        return userService.getTokenUser(token)
+        return userService.getCurrentUser(token)
 
