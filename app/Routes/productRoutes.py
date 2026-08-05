@@ -9,11 +9,15 @@ productRouter = APIRouter()
 @productRouter.post("/product", status_code=201)
 def addNewProduct(product : Product,current_user=Depends(userService.getCurrentUser)):
     if current_user["user_role"]=="admin":
-        product_collection.insert_one(product.model_dump())
-        return {
-            "message" : "Product added",
-            "product" : product
-        }
+        get_product=product_collection.find_one({"product_id" : product.product_id})
+        if get_product is None:
+            product_collection.insert_one(product.model_dump())
+            return {
+                "message" : "Product added",
+                "product" : product
+            }
+        else:
+            raise HTTPException(status_code=401,detail="Product already exists in inventory")
     else:
         raise HTTPException(status_code=403, detail="Only admin can add products")
 

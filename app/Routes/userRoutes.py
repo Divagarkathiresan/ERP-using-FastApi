@@ -13,25 +13,13 @@ class userRoute:
     def addNewUser(user:User):
         return userService.userRegister(user)
 
-
     @userRouter.post("/user/login",status_code=200)
     def userLogin(loginUser:LoginRequest):
         return userService.userLogin(loginUser)
         
-
     @userRouter.get("/user",status_code=200)
     def getAllUsers():
         return userService.getAllUsers()
-
-    # @userRouter.get("/token",status_code=200)
-    # def checkToken():
-    #     token = generateToken(
-    #         {
-    #             "user_email":"divagar656@gmail.com",
-    #             "user_password":"1234"
-    #         }
-    #     )
-    #     return {"token" : token}
 
     @userRouter.get("/getUser")
     def getUser(token:str = Body(... ,embed=True)):

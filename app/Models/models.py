@@ -6,8 +6,12 @@ class Product(BaseModel):
     product_id:str
     product_name : str
     product_price : int
-    product_quantity : int
     product_category:str
+
+class Inventory(BaseModel):
+    inventory_id : str
+    product_id : str
+    quantity : int
 
 class User(BaseModel):
     user_id:str
@@ -20,3 +24,10 @@ class User(BaseModel):
 class LoginRequest(BaseModel):
     user_email: str
     user_password: str
+class OrderItems(BaseModel):
+    product_id : str
+    quantity : int
+    sub_total : int
+class Orders(BaseModel):
+    order_id : str
+    items : list[OrderItems]
