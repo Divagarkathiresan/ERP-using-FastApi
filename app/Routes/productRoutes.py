@@ -1,32 +1,19 @@
 from fastapi import Depends,APIRouter,HTTPException
-from ..Database.database import product_collection
+from ..Database.database import product_collection,inventory_collection
 from ..Models.models import Product
 from bson import ObjectId
 from ..Services.userService import userService
+from ..Services.productService import productService
 
 productRouter = APIRouter()
 
 @productRouter.post("/product", status_code=201)
 def addNewProduct(product : Product,current_user=Depends(userService.getCurrentUser)):
-    if current_user["user_role"]=="admin":
-        get_product=product_collection.find_one({"product_id" : product.product_id})
-        if get_product is None:
-            product_collection.insert_one(product.model_dump())
-            return {
-                "message" : "Product added",
-                "product" : product
-            }
-        else:
-            raise HTTPException(status_code=401,detail="Product already exists in inventory")
-    else:
-        raise HTTPException(status_code=403, detail="Only admin can add products")
+    return productService.addNewProduct(product,current_user)
 
 @productRouter.get("/product",status_code=200)
 def getAllProducts():
-    products=list(product_collection.find())
-    for product in products:
-        product["_id"]=str(product["_id"])
-    return products
+    return productService.getAllProducts()
 
 @productRouter.get("/product/{id}",status_code=200)
 def getSingleProduct(id : str):

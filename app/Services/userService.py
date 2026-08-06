@@ -16,7 +16,11 @@ class userService:
             user_collection.insert_one(newUser.model_dump())
             return {
                 "message" : "Admin registered" if newUser.user_role=="admin" else "User registered",
-                "user" : newUser
+                "user" : {
+                    "Id" : newUser.user_id,
+                    "User name":newUser.user_name,
+                    "Email" : newUser.user_email
+                }
             }
     
     def userLogin(loginUser:LoginRequest):

@@ -31,6 +31,7 @@ try:
     # Collections
     product_collection = db["products"]
     user_collection = db["users"]
+    inventory_collection=db["inventory"]
 
     logger.info("MongoDB connected successfully.")
 
