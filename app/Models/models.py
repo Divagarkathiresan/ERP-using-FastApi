@@ -18,12 +18,13 @@ class User(BaseModel):
     user_name : str
     user_email : str 
     user_password : str
-    user_role : Literal["admin", "user"]="user"
+    user_role : Literal["admin","manager" ,"user"]="user"
 
 #login model
 class LoginRequest(BaseModel):
     user_email: str
     user_password: str
+    
 class OrderItems(BaseModel):
     product_id : str
     quantity : int

@@ -58,11 +58,7 @@ class userService:
 
     def getCurrentUser(token:str = Depends(oauth2_scheme)):
         try:
-            payload = jwt.decode(
-                token,
-                SECRET_KEY,
-                algorithms=[ALGORITHM]
-            )
+            payload = decodeToken(token)
             user_email = payload.get("user_email")
 
             if user_email is None:

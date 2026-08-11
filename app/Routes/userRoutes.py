@@ -20,8 +20,3 @@ class userRoute:
     @userRouter.get("/user",status_code=200)
     def getAllUsers():
         return userService.getAllUsers()
-
-    @userRouter.get("/getUser")
-    def getUser(token:str = Body(... ,embed=True)):
-        return userService.getCurrentUser(token)
-
