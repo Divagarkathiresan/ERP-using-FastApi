@@ -21,5 +21,29 @@ class inventoryService:
         else:
             raise HTTPException(status_code=401,detail="Only managers can add the inventories")
 
-    
+
+    def getAllInventories(current_user : User):
+        if current_user["user_role"] == "manager":
+            inventories=list(inventory_collection.find({}))
+            for inventory in inventories:
+                inventory["_id"]=str(inventory["_id"])
+            return inventories
+        else:
+            raise HTTPException(status_code=401,detail="Only managers can see the inventories")
+
+    def updateSingleInventory(id:str,updateInventory:Inventory):
+        inventory=inventory_collection.update_one(
+            {"inventory_id" : id},
+            {"$set" : updateInventory.model_dump()}
+        )
+
+        if inventory.modified_count == 0:
+            raise HTTPException(status_code=200,detail="No data updated")
+        else:
+            return {
+                "Message":"Data updated",
+                "Updated Inventory":updateInventory
+            }
+
+        
         

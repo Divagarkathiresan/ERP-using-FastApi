@@ -24,11 +24,20 @@ class User(BaseModel):
 class LoginRequest(BaseModel):
     user_email: str
     user_password: str
-    
-class OrderItems(BaseModel):
+
+class OrderItem(BaseModel):
     product_id : str
     quantity : int
-    sub_total : int
+
 class Orders(BaseModel):
+    items:list[OrderItem]
+
+class OrderList(BaseModel):
     order_id : str
-    items : list[OrderItems]
+    items : list[OrderItem]
+    total_amount:int
+class invoice(BaseModel):
+    invoice_id : str
+    user_id :str
+    order_id : str
+    total_amount : int

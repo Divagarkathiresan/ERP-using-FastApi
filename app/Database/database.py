@@ -32,7 +32,10 @@ try:
     product_collection = db["products"]
     user_collection = db["users"]
     inventory_collection=db["inventory"]
-
+    orderItem_collection=db["orderItem"]
+    orders_collection=db["orders"]
+    orderList_collection=db["orderList"]
+    invoice_collection=db["invoice"]
     logger.info("MongoDB connected successfully.")
 
 except Exception:
