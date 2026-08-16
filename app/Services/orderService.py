@@ -1,15 +1,16 @@
 from fastapi import HTTPException,Depends
 from ..Services.userService import userService
 from ..Models.models import Orders
-from ..Database.database import orderItem_collection,inventory_collection,orders_collection,product_collection
+from ..Database.database import orderItem_collection,inventory_collection,orders_collection,product_collection,invoice_collection
 class orderService:
 
     def postOrders(orders : Orders):
+
         total_amount=0
-        order_items=[]
+        orders_list=[]
 
         #order id generation
-        order_id = "O" + str(orders_collection.count_documents({})+1)
+        order_id = "Order-" + str(orders_collection.count_documents({})+1)
 
         #retriving single item from the list of items
         for order in orders.items:
@@ -41,12 +42,10 @@ class orderService:
             total_amount+=order_amount
 
             #add item to order
-            order_items.append(
-                {
-                    "product_id":order.product_id,
-                    "quantity":order.quantity
-                }
-            )
+            order_list_dict={
+                "item":order.model_dump(),
+                "sub_total":order_amount
+            }
 
             #if product and quantity is ok , then update the quantity in the inventory
             inventory_collection.update_one(
@@ -56,22 +55,27 @@ class orderService:
                         "quantity" : -order.quantity
                     }
                 }
+            ) 
+
+            orders_list.append(
+                order_list_dict
             )
 
-        order_list_dict={
+
+        invoice_model_dict={
             "order_id":order_id,
-            "items":order_items,
+            "orders":orders_list,
             "total_amount":total_amount
         }
 
-        orders_collection.insert_one(order_list_dict)
+        invoice_collection.insert_one(invoice_model_dict)
 
         return {
-            "success": True,
-            "message": "Order placed successfully",
-            "order": {
-                "order_id": order_list_dict["order_id"],
-                "items": order_list_dict["items"],
-                "total_amount": order_list_dict["total_amount"]
+            "Sucess":True,
+            "Message":"Order placed sucessfully",
+            "Invoice":{
+                "order_id":invoice_model_dict["order_id"],
+                "orders":invoice_model_dict["orders"],
+                "total_amount":invoice_model_dict["total_amount"]
             }
-        }             
+        }

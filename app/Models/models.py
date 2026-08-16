@@ -33,11 +33,9 @@ class Orders(BaseModel):
     items:list[OrderItem]
 
 class OrderList(BaseModel):
-    order_id : str
-    items : list[OrderItem]
-    total_amount:int
+    item : OrderItem
+    sub_total:int
 class invoice(BaseModel):
-    invoice_id : str
-    user_id :str
     order_id : str
+    orders : list[OrderList]
     total_amount : int
