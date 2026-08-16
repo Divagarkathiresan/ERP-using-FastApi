@@ -10,7 +10,7 @@ class orderService:
         orders_list=[]
 
         #order id generation
-        order_id = "Order-" + str(orders_collection.count_documents({})+1)
+        order_id = "Order - " + str(orders_collection.count_documents({})+1)
 
         #retriving single item from the list of items
         for order in orders.items:
