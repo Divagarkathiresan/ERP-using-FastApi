@@ -1,23 +1,31 @@
 from fastapi import Depends,HTTPException
-from app.Models.models import User
+from app.Models.models import User,RegisterRequest
 from app.Models.models import LoginRequest
 from ..Database.database import user_collection
-from ..utils.jwtconfig import *
+from ..utils.jwtAndPasswordConfig import *
 from jose import jwt,JWTError
 from fastapi.security import OAuth2PasswordBearer
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="user/login")
 class userService:
 
-    def userRegister(newUser:User):
+    def userRegister(newUser:RegisterRequest):
             existing_user=user_collection.find_one({"user_email":newUser.user_email})
             if existing_user:
                 raise HTTPException(status_code=400,detail="User already exists")
-            user_collection.insert_one(newUser.model_dump())
+            
+            user_id="USER - " + str(user_collection.count_documents({}))
+
+            User = newUser.model_dump()
+
+            User.update({"user_id":user_id})
+            User["user_password"] = hashPassword(newUser.user_password)
+            user_collection.insert_one(User)
+
             return {
                 "message" : "Admin registered" if newUser.user_role=="admin" else "User registered",
                 "user" : {
-                    "Id" : newUser.user_id,
+                    "Id" : user_id,
                     "User name":newUser.user_name,
                     "Email" : newUser.user_email
                 }
@@ -28,7 +36,8 @@ class userService:
              {"user_email":loginUser.user_email}
         )
         if user is not None:
-            if user["user_password"] == loginUser.user_password:
+
+            if verifyPassword(loginUser.user_password , user["user_password"]):
 
                 token=generateToken(
                      {
@@ -47,7 +56,7 @@ class userService:
         else:
             return{
               "detail" : "Register before login"
-              }
+            }
          
     def getAllUsers():
         users=list(user_collection.find())

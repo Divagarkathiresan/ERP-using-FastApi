@@ -20,6 +20,13 @@ class User(BaseModel):
     user_password : str
     user_role : Literal["admin","manager" ,"user"]="user"
 
+#Register model
+class RegisterRequest(BaseModel):
+    user_name : str
+    user_email : str 
+    user_password : str
+    user_role : Literal["admin","manager" ,"user"]="user"
+    
 #login model
 class LoginRequest(BaseModel):
     user_email: str

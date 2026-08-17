@@ -1,16 +1,16 @@
 from fastapi import APIRouter,Body
 from ..Database.database import user_collection
-from ..Models.models import User
+from ..Models.models import RegisterRequest
 from ..Models.models import LoginRequest
 from ..Services.userService import userService
-from ..utils.jwtconfig import generateToken
+from ..utils.jwtAndPasswordConfig import generateToken
 
 userRouter=APIRouter()
 
 class userRoute:
 
     @userRouter.post("/user/register",status_code=201)
-    def addNewUser(user:User):
+    def addNewUser(user:RegisterRequest):
         return userService.userRegister(user)
 
     @userRouter.post("/user/login",status_code=200)
