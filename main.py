@@ -8,3 +8,4 @@ app=FastAPI()
 app.include_router(productRouter)
 app.include_router(userRouter)
 app.include_router(inventoryRoute.inventoryRouter)
+
