@@ -94,7 +94,8 @@ erp_backend/
 |--------|----------|-------------|---------------|------|
 | POST | `/inventory` | Add new inventory | Yes | manager |
 | GET | `/inventory` | Get all inventories | Yes | manager |
-| PUT | `/inventory/{id}` | Update inventory | No | - |
+| PUT | `/inventory/{id}` | Update inventory | Yes | manager |
+| DELETE | `/inventory/{id}` | Delete inventory | Yes | manager |
 
 ### Order Routes (`/order`)
 | Method | Endpoint | Description | Auth Required |
