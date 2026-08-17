@@ -22,6 +22,8 @@ class inventoryRoute:
     def updateSingleInventory(id:str,updateInventory:Inventory):
         return inventoryService.updateSingleInventory(id,updateInventory)
 
-    @inventoryRouter.post("/order")
-    def postOrder(items : Orders):
-        return orderService.postOrders(items)
+    @inventoryRouter.delete("/inventory/{id}",status_code=200)
+    def deleteSingleInventory(id:str,current_user=Depends(userService.getCurrentUser)):
+        return inventoryService.deleteSingleInventory(id,current_user)
+
+    

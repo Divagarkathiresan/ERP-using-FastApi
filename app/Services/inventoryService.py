@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from ..Database.database import inventory_collection
+from ..Database.database import inventory_collection,product_collection
 from ..Models.models import Inventory
 from ..Models.models import User
 
@@ -10,12 +10,19 @@ class inventoryService:
             getExistingInventoryId=inventory_collection.find_one({
                 "inventory_id" : inventory.inventory_id
             })
+            getProductId=product_collection.find_one({
+                "product_id":inventory.product_id
+            })
             if getExistingInventoryId is None:
-                inventory_collection.insert_one(inventory.model_dump())
-                return{
-                    "Message" : "New inventory added",
-                    "Inventory" : inventory
-                }
+                if getProductId is not None:
+                    inventory_collection.insert_one(inventory.model_dump())
+                    return{
+                        "Message" : "New inventory added",
+                        "Inventory" : inventory
+                    }
+                else:
+                    raise HTTPException(status_code=404,detail="Product not found")
+
             else:
                 raise HTTPException(status_code=409,detail="Inventory already in the cart")
         else:
@@ -45,5 +52,22 @@ class inventoryService:
                 "Updated Inventory":updateInventory
             }
 
+    def deleteSingleInventory(id:str,current_user:User):
+        if current_user["user_role"] == "manager":
+            result=inventory_collection.delete_one({
+                "inventory_id":id
+            })
+            if result.deleted_count == 0:
+                raise HTTPException(
+                    status_code=404,
+                    detail="Inventory not found"
+                )
+            else:
+                return{"message":"Inventory deleted"}
         
+        else:
+            return HTTPException(
+                status_code=401,
+                detail="Only managers can delete the inventory"
+            )
         

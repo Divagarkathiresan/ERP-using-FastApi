@@ -1,7 +1,7 @@
 from fastapi import HTTPException,Depends
 from ..Services.userService import userService
 from ..Models.models import Orders
-from ..Database.database import orderItem_collection,inventory_collection,orders_collection,product_collection,invoice_collection
+from ..Database.database import inventory_collection,orders_collection,product_collection,invoice_collection
 class orderService:
 
     def postOrders(orders : Orders):
@@ -11,6 +11,8 @@ class orderService:
 
         #order id generation
         order_id = "Order - " + str(orders_collection.count_documents({})+1)
+
+        orders_collection.insert_one(orders.model_dump())
 
         #retriving single item from the list of items
         for order in orders.items:
@@ -41,7 +43,7 @@ class orderService:
             order_amount=product_found["product_price"]*(order.quantity)
             total_amount+=order_amount
 
-            #add item to order
+            #single item and its price
             order_list_dict={
                 "item":order.model_dump(),
                 "sub_total":order_amount
