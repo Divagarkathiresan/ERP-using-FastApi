@@ -1,6 +1,5 @@
 from jose import jwt
 from datetime import datetime,timedelta
-from passlib.context import CryptContext
 import bcrypt
 
 
@@ -8,14 +7,9 @@ SECRET_KEY="DivagarIsACulprit"
 ALGORITHM="HS256"
 EXIPRATION_IN_MINUTES=30
 
-pwd_context=CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto"
-)
+def generateToken(userDetail : dict):
 
-def generateToken(detail : dict):
-
-    data=detail.copy()
+    data=userDetail.copy()
 
     expire=datetime.utcnow() + timedelta(
         minutes=EXIPRATION_IN_MINUTES
